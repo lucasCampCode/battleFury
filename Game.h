@@ -18,7 +18,6 @@ private:
 	void draw();
 	void end();
 private:
-	bool multiPlayer = false;
 	bool m_gameOver = false;
 	bool turn1 = true;
 	int m_roundNum = 0;
