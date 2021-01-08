@@ -43,33 +43,53 @@ bool Game::save()
 	if (!file.is_open())
 		return false;
 	file.write((char*)&m_roundNum, sizeof(int));
-	file.close();
-
-	file.open("CharacterData.txt", std::ios::app | std::ios::binary);
-	if (!file.is_open())
-		return false;
 	file.write((char*)&m_player1, sizeof(Character));
 	file.write((char*)&m_player2, sizeof(Character));
 	file.write((char*)m_enemies, sizeof(Character) * 10);
 	file.close();
+
 	return true;
 }
 
 bool Game::load()
 {
+	int savedSlot = 0;
 	std::fstream file;
 	file.open("gameData.txt", std::ios::in | std::ios::binary);
 	if (!file.is_open())
 		return false;
-	file.read((char*)&m_roundNum, sizeof(int));
-	file.close();
+	while (file.peek() != EOF)
+	{
+		file.read((char*)&m_roundNum, sizeof(int));
+		file.read((char*)&m_player1, sizeof(Character));
+		file.read((char*)&m_player2, sizeof(Character));
+		file.read((char*)m_enemies, sizeof(Character) * 10);
+		std::cout << "save: " << savedSlot << std::endl;
+		std::cout << "round: " << m_roundNum << std::endl;
+		std::cout << "player1 name: " << m_player1->getName() << std::endl;
+		std::cout << "player1 health: " << m_player1->getHealth() << std::endl;
+		std::cout << "player1 damage: " << m_player1->getDamage() << std::endl;
+		if (m_player2->getName() != "???")
+		{
+			std::cout << "player2 name: " << m_player2->getName() << std::endl;
+			std::cout << "player2 health: " << m_player2->getHealth() << std::endl;
+			std::cout << "player2 damage: " << m_player2->getDamage() << std::endl;
+		}
+		savedSlot++;
+	}
+	file.seekg(std::ios::beg);
+	std::cout << "what save do you want to load from" << std::endl;
+	std::cin >> savedSlot;
+	for (int i = 0; i < savedSlot; i++) {
+		file.seekg(sizeof(int), std::ios::cur);
+		file.seekg(sizeof(Character) * 12, std::ios::cur);
+	}
 
-	file.open("CharacterData.txt", std::ios::in | std::ios::binary);
-	if (!file.is_open())
-		return false;
+	file.read((char*)&m_roundNum, sizeof(int));
 	file.read((char*)&m_player1, sizeof(Character));
 	file.read((char*)&m_player2, sizeof(Character));
 	file.read((char*)m_enemies, sizeof(Character) * 10);
+
 	file.close();
 
 	return true;
